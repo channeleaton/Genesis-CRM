@@ -1,0 +1,15 @@
+/* Contact Menu Icon */
+#menu-posts-contact .wp-menu-image {
+  background: url(../../images/user-white.png) no-repeat 6px -17px !important;
+}
+#menu-posts-contact:hover .wp-menu-image, #menu-posts-contact.wp-has-current-submenu .wp-menu-image {
+  background-position:6px 7px!important;
+}
+
+/* Project Menu Icon */
+#menu-posts-project .wp-menu-image {
+  background: url(../../images/application-blog.png) no-repeat 6px -17px !important;
+}
+#menu-posts-project:hover .wp-menu-image, #menu-posts-project.wp-has-current-submenu .wp-menu-image {
+  background-position:6px 7px!important;
+}

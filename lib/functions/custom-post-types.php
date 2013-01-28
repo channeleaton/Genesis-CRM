@@ -74,16 +74,10 @@ function crm_create_projects_cpt() {
 
 } // crm_create_projects_cpt
 
-add_action( 'admin_head', 'cpt_icons' );
+add_action( 'admin_enqueue_scripts', 'cpt_icons' );
 function cpt_icons() {
-    echo '<style type="text/css" media="screen">;
-          #menu-posts-contact .wp-menu-image {
-            background: url(' . get_bloginfo('stylesheet_directory') . '/images/user-white.png) no-repeat 6px -17px !important;
-          }
-          #menu-posts-contact:hover .wp-menu-image, #menu-posts-contact.wp-has-current-submenu .wp-menu-image {
-            background-position:6px 7px!important;
-          }
-          </style>';
+  wp_register_style( 'cpt_icons', get_bloginfo( 'stylesheet_directory' ) . '/lib/css/admin-style.css', false, '1.0' );
+  wp_enqueue_style( 'cpt_icons' );
 }
 
 /**
