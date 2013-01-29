@@ -13,3 +13,11 @@
 #menu-posts-project:hover .wp-menu-image, #menu-posts-project.wp-has-current-submenu .wp-menu-image {
   background-position:6px 7px!important;
 }
+
+/* Interaction Menu Icon */
+#menu-posts-interaction .wp-menu-image {
+  background: url(../../images/mail.png) no-repeat 6px -17px !important;
+}
+#menu-posts-interaction:hover .wp-menu-image, #menu-posts-interaction.wp-has-current-submenu .wp-menu-image {
+  background-position:6px 7px!important;
+}

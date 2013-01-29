@@ -22,6 +22,13 @@ add_action('genesis_setup','child_theme_setup', 15);
 function child_theme_setup() {
 	
 	// ** Backend **
+
+  // Load admin scripts
+  add_action( 'admin_enqueue_scripts', 'crm_admin_scripts' );
+
+  // Load admin styles
+  add_action( 'admin_enqueue_scripts', 'crm_admin_styles' );
+
 	// Remove Unused Menu Items
 	add_action('admin_menu', 'be_remove_menus');
 	
@@ -32,14 +39,8 @@ function child_theme_setup() {
 	add_action( 'save_post', 'mfields_set_default_object_terms', 100, 2 );
 
 	// Set up Meta Boxes
-
-  // Re-define meta box path and URL
-  define( 'RWMB_URL', trailingslashit( get_stylesheet_directory_uri() . '/lib/meta-box' ) );
-  define( 'RWMB_DIR', trailingslashit( CHILD_DIR . '/lib/meta-box' ) );
-  // Include the meta box script
-  require_once RWMB_DIR . 'meta-box.php';
-  // Include the meta box definition (the file where you define meta boxes, see `demo/demo.php`)
   include CHILD_DIR . '/lib/functions/create-metaboxes.php';
+
 	// Setup Sidebars
 	genesis_register_sidebar(array('name' => 'Home Column 1', 'id' => 'home-column-1'));
 	genesis_register_sidebar(array('name' => 'Home Column 2', 'id' => 'home-column-2'));
@@ -65,9 +66,6 @@ function child_theme_setup() {
 	// Don't update theme
 	add_filter( 'http_request_args', 'be_dont_update_theme', 5, 2 );
 		
-  // Include custom post types
-  include_once( 'lib/functions/custom-post-types.php' );
-
 	// Remove post meta fields
 	add_action( 'admin_menu' , 'crm_remove_page_fields' );
 	
@@ -76,6 +74,8 @@ function child_theme_setup() {
 	
 	// Remove Genesis Layout Options
 	remove_post_type_support( 'post', 'genesis-layouts' );
+
+  define( 'CRM_PREFIX', '_crm_' );
 	
 	// ** Frontend **		
 
@@ -84,9 +84,33 @@ function child_theme_setup() {
 	
 	// Remove Footer
 	remove_action('genesis_footer', 'genesis_do_footer');
+//print_r(get_post_meta(45, '_crm_main_contact', true));
+//add_post_meta(45, '_crm_main_contact', 'mike-burkowski');
 }
 
+function custom_post_type_setup() {
+  // Include custom post types
+  include_once( 'lib/functions/custom-post-types.php' );
+}
+add_action('registered_post_type', 'custom_post_type_setup');
+
+function crm_terms() {
+  $terms = get_terms('contact', 'orderby=count&hide_empty=0');
+  //print_r($terms);
+}
+add_action('init', 'crm_terms', 12);
 // ** Backend Functions ** //
+
+function crm_admin_scripts() {
+  wp_register_script( 'crm_admin_scripts', get_bloginfo( 'stylesheet_directory' ) . '/lib/js/admin.js' );
+  wp_enqueue_script( 'crm_admin_scripts' );
+  
+} // crm_admin_scripts
+
+function crm_admin_styles() {
+  wp_register_style( 'crm_admin_styles', get_bloginfo( 'stylesheet_directory' ) . '/lib/css/admin-style.css', false, '1.0' );
+  wp_enqueue_style( 'crm_admin_styles' );
+} // crm_admin_styles
 
 /**
  * Remove Menu Items

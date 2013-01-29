@@ -74,44 +74,42 @@ function crm_create_projects_cpt() {
 
 } // crm_create_projects_cpt
 
-add_action( 'admin_enqueue_scripts', 'cpt_icons' );
-function cpt_icons() {
-  wp_register_style( 'cpt_icons', get_bloginfo( 'stylesheet_directory' ) . '/lib/css/admin-style.css', false, '1.0' );
-  wp_enqueue_style( 'cpt_icons' );
-}
+add_action( 'init', 'crm_create_interactions_cpt' );
+function crm_create_interactions_cpt() {
+  $labels = array(
+    'name' => 'Interactions',
+    'singular_name' => 'Interaction',
+    'add_new' => 'Add New',
+    'add_new_item' => 'Add New Interaction',
+    'edit_item' => 'Edit Interaction',
+    'new_item' => 'New Interaction',
+    'all_items' => 'All Interactions',
+    'view_item' => 'View Interactions',
+    'search_items' => 'Search Interactions',
+    'not_found' =>  'No Interactions found',
+    'not_found_in_trash' => 'No Interactions found in Trash', 
+    'parent_item_colon' => '',
+    'menu_name' => 'Interactions'
+  );
 
-/**
- * Change Posts to Contacts
- *
- * @author Andrew Norcross
- * @link http://www.billerickson.net/twentyten-crm/
- */
- 
-function crm_change_post_menu_label() {
-	global $menu;
-	global $submenu;
-	$menu[5][0] = 'Contacts';
-	$menu[10][0] = 'Files';	
-	$submenu['edit.php'][5][0] = 'Contacts';
-	$submenu['edit.php'][10][0] = 'Add Contacts';
-	$submenu['edit.php'][15][0] = 'Status';
-	echo '';
-}
+  $args = array(
+    'labels' => $labels,
+    'public' => true,
+    'publicly_queryable' => true,
+    'show_ui' => true, 
+    'show_in_menu' => true, 
+    'query_var' => true,
+    'rewrite' => array( 'slug' => 'interaction' ),
+    'capability_type' => 'post',
+    'has_archive' => true, 
+    'hierarchical' => false,
+    'menu_position' => 5,
+    'supports' => array( 'title', 'thumbnail', 'comments' )
+  ); 
 
-function crm_change_post_object_label() {
-	global $wp_post_types;
-	$labels = &$wp_post_types['post']->labels;
-	$labels->name = 'Contacts';
-	$labels->singular_name = 'Contact';
-	$labels->add_new = 'Add Contact';
-	$labels->add_new_item = 'Add Contact';
-	$labels->edit_item = 'Edit Contacts';
-	$labels->new_item = 'Contact';
-	$labels->view_item = 'View Contact';
-	$labels->search_items = 'Search Contacts';
-	$labels->not_found = 'No Contacts found';
-	$labels->not_found_in_trash = 'No Contacts found in Trash';
-}
+  register_post_type( 'interaction', $args );
+
+} // crm_create_interactions_cpt
 
 /**
  * Change post title text
@@ -131,6 +129,162 @@ function crm_change_title_text( $translation ) {
 	}
 	return $translation;
 }
+
+/**
+ * Add columns to Project list
+ *
+ * @author J. Aaron Eaton <aaron@channeleaton.com>
+ */
+function crm_add_project_columns( $defaults ) {
+
+  $new_cols['cb'] = '<input type="checkbox" />';
+  $new_cols['title'] = _x( 'Project Name', 'column name' );
+  $new_cols['custom_post_type_onomies_contact'] = __( 'Contact' );
+  $new_cols['project_type'] = 'Type';
+  $new_cols['project_status'] = 'Status';
+  $new_cols['date'] = _x( 'Date', 'column name' );
+  return $new_cols;
+
+} // crm_add_project_columns
+add_filter( 'manage_project_posts_columns', 'crm_add_project_columns' );
+
+/**
+ * Adds content to the Project list columns
+ *
+ * @author J. Aaron Eaton <aaron@channeleaton.com>
+ */
+function crm_add_project_columns_content( $column_name, $post_ID ) {
+
+  if ( $column_name == 'custom_post_type_onomies_contact' ) {
+    $contact = get_the_terms( $post_ID, 'contact' );
+    if ( $contact ) {
+      foreach ( $contact as $c ) {
+        if ( $c->slug == 'blank' )
+          echo 'Not Selected';
+        // Link to selected contact is handled by CPT-Onomies plugin
+      }
+    }
+  }
+
+  if ( $column_name == 'project_type' ) {
+    $type = rwmb_meta( '_crm_project_type', '', $post_ID );
+    echo $type;
+  }
+
+  if ( $column_name == 'project_status' ) {
+    $status = rwmb_meta( '_crm_project_status', '', $post_ID );
+    echo $status;
+  }
+
+} // crm_add_project_columns_content
+add_action( 'manage_project_posts_custom_column', 'crm_add_project_columns_content', 10, 2 );
+
+/**
+ * Add columns to Contacts list
+ *
+ * @author J. Aaron Eaton <aaron@channeleaton.com>
+ */
+function crm_add_contact_columns( $defaults ) {
+
+  $new_cols['cb'] = '<input type="checkbox" />';
+  $new_cols['title'] = _x( 'Contact Name', 'column name' );
+  $new_cols['client_email'] = 'Email';
+  $new_cols['client_phone'] = 'Phone';
+  $new_cols['date'] = _x( 'Date', 'column name' );
+  return $new_cols;
+
+} // crm_add_contact_columns
+add_filter( 'manage_contact_posts_columns', 'crm_add_contact_columns' );
+
+/**
+ * Adds content to the Contact list columns
+ *
+ * @author J. Aaron Eaton <aaron@channeleaton.com>
+ */
+function crm_add_contact_columns_content( $column_name, $post_ID ) {
+
+  if ( $column_name == 'client_email' ) {
+    $email = rwmb_meta( '_crm_client_email', '', $post_ID );
+    if ( $email )
+      echo '<a href="mailto:' . $email . '">' . $email . '</a>';
+  }
+
+  if ( $column_name == 'client_phone' ) {
+    $phone = rwmb_meta( '_crm_client_phone', '', $post_ID );
+    if ( $phone )
+      echo $phone;
+  }
+
+} // crm_add_contact_columns_content
+add_action( 'manage_contact_posts_custom_column', 'crm_add_contact_columns_content', 10, 2 );
+
+/**
+ * Add columns to Interaction list
+ *
+ * @author J. Aaron Eaton <aaron@channeleaton.com>
+ */
+function crm_add_interaction_columns( $defaults ) {
+
+  $new_cols['cb'] = '<input type="checkbox" />';
+  $new_cols['date_time'] = _x( 'Date/Time', 'column name' );
+  $new_cols['flow'] = 'Flow';
+  $new_cols['custom_post_type_onomies_contact'] = 'Contact';
+  $new_cols['custom_post_type_onomies_project'] = 'Project';
+  $new_cols['medium'] = 'Medium';
+  return $new_cols;
+
+} // crm_add_contact_columns
+add_filter( 'manage_interaction_posts_columns', 'crm_add_interaction_columns' );
+
+/**
+ * Adds content to the Interaction list columns
+ *
+ * @author J. Aaron Eaton <aaron@channeleaton.com>
+ */
+function crm_add_interaction_columns_content( $column_name, $post_ID ) {
+
+  if ( $column_name == 'date_time' ) {
+    $dt = rwmb_meta( '_crm_inter_datetime', '', $post_ID );
+    if( $dt )
+      edit_post_link( $dt, '', '', $post_ID );
+  }
+
+  if ( $column_name == 'flow' ) {
+    $flow = rwmb_meta( '_crm_inter_flow', '', $post_ID );
+    if ( $flow )
+      echo $flow;
+  }
+
+  if ( $column_name == 'custom_post_type_onomies_contact' ) {
+    $contact = get_the_terms( $post_ID, 'contact' );
+    if ( $contact ) {
+      foreach ( $contact as $c ) {
+        if ( $c->slug == 'blank' )
+          echo 'Not Selected';
+        // Link to selected contact is handled by CPT-Onomies plugin
+      }
+    }
+  }
+
+  if ( $column_name == 'custom_post_type_onomies_project' ) {
+    $project = get_the_terms( $post_ID, 'project' );
+    if ( $project ) {
+      foreach ( $project as $p ) {
+        if ( $p->slug == 'blank' )
+          echo 'Not Selected';
+        // Link to selected contact is handled by CPT-Onomies plugin
+      }
+    }
+  }
+
+  if ( $column_name == 'medium' ) {
+    $med = rwmb_meta( '_crm_inter_medium', '', $post_ID );
+    if ( $med )
+      echo $med;
+  }
+
+} // crm_add_interaciton_columns_content
+add_action( 'manage_interaction_posts_custom_column', 'crm_add_interaction_columns_content', 10, 2 );
 
 /**
  * Modify post column layout

@@ -52,9 +52,27 @@ $meta_boxes[] = array(
       'type'    => 'text',
     ),
     array(
+      'name' => 'Address',
+      'id'   => "{$prefix}client_address",
+      'type' => 'textarea',
+      'cols' => '30',
+      'rows' => '4',
+    ),
+    array(
       'name' => 'Referred By:',
       'id'   => "{$prefix}other_referral",
       'type' => 'text',
+    ),
+    array(
+      'name' => 'Notes',
+      'id'   => "{$prefix}client_notes",
+      'type' => 'wysiwyg',
+			'std'  => '',
+			'options' => array(
+				'textarea_rows' => 15,
+				'teeny'         => false,
+				'media_buttons' => true,
+			),
     ),
 	),
 );
@@ -76,26 +94,16 @@ $meta_boxes[] = array(
 				// How to show taxonomy: 'checkbox_list' (default) or 'checkbox_tree', 'select_tree' or 'select'. Optional
 				'type' => 'select_tree',
 				// Additional arguments for get_terms() function. Optional
-				'args' => array()
+        'args' => array(
+          'orderby' => 'name',
+          'hide_empty' => false,
+        ),
 			),
 		),
-    array(
-      'name' => 'Reason for forwarding away or losing',
-      'id'   => "{$prefix}reason",
-      'type' => 'select',
-      'options' => array(
-        '' => '',
-        'project too small' => 'Project Too Small',
-        'not interested'    => 'Not Interested',
-        'outside expertise' => 'Outside Expertise',
-        'timeframe too short' => 'Timeframe Too Short',
-        'quoted too high'   => 'Quoted Too High',
-      ),
-    ),
     array (
       'name' => 'Project Type',
       'id'   => "{$prefix}project_type",
-      'type' => 'checkbox_list',
+      'type' => 'select',
       'options' => array(
         'Custom Theme' => 'Custom Theme',
         'Theme Modification' => 'Theme Modification',
@@ -110,12 +118,29 @@ $meta_boxes[] = array(
       'id'   => "{$prefix}project_status",
       'type' => 'select',
       'options' => array(
-        'Deck' => 'On Deck',
-        'Dev' => 'In Development',
-        'Edit' => 'Editing',
-        'Dev Complete' => 'Development Complete',
+        ''        => '',
+        'Prospect' => 'Prospect',
+        'Quoting' => 'Quoting',
+        'On Deck' => 'On Deck',
+        'In Development' => 'In Development',
+        'Editing' => 'Editing',
+        'Development Complete' => 'Development Complete',
         'Project Complete' => 'Project Complete',
         'Maintenance' => 'Maintenance',
+        'Cancelled' => 'Cancelled',
+      ),
+    ),
+    array(
+      'name' => 'Reason for forwarding away or losing',
+      'id'   => "{$prefix}reason",
+      'type' => 'select',
+      'options' => array(
+        '' => '',
+        'project too small' => 'Project Too Small',
+        'not interested'    => 'Not Interested',
+        'outside expertise' => 'Outside Expertise',
+        'timeframe too short' => 'Timeframe Too Short',
+        'quoted too high'   => 'Quoted Too High',
       ),
     ),
     array(
@@ -226,6 +251,82 @@ $meta_boxes[] = array(
       'type' => 'textarea',
       'cols' => 20,
       'rows' => 8,
+    ),
+  ),
+);
+
+$meta_boxes[] = array(
+  'id' => 'interaction-details',
+  'title' => 'Details',
+  'pages' => array( 'interaction' ),
+  'context' => 'normal',
+  'priority' => 'high',
+  'fields' => array(
+    array(
+      'name' => 'Date/Time',
+      'id'   => "{$prefix}inter_datetime",
+      'type' => 'datetime',
+			'js_options' => array(
+				'stepMinute'     => 1,
+				'showTimepicker' => true,
+      ),
+    ),
+    array(
+      'name' => 'Flow',
+      'id'   => "{$prefix}inter_flow",
+      'type' => 'radio',
+      'options' => array(
+        'Inbound' => 'Inbound',
+        'Outbound' => 'Outbound',
+      ),
+    ),
+    array(
+      'name' => 'Contact',
+      'id'   => "{$prefix}inter_contact",
+      'type' => 'taxonomy',
+			'options' => array(
+				// Taxonomy name
+				'taxonomy' => 'contact',
+				// How to show taxonomy: 'checkbox_list' (default) or 'checkbox_tree', 'select_tree' or 'select'. Optional
+				'type' => 'select_tree',
+				// Additional arguments for get_terms() function. Optional
+				'args' => array()
+			),
+    ),
+    array(
+      'name' => 'Project',
+      'id'   => "{$prefix}inter_project",
+      'type' => 'taxonomy',
+			'options' => array(
+				// Taxonomy name
+				'taxonomy' => 'project',
+				// How to show taxonomy: 'checkbox_list' (default) or 'checkbox_tree', 'select_tree' or 'select'. Optional
+				'type' => 'select_tree',
+				// Additional arguments for get_terms() function. Optional
+				'args' => array()
+			),
+    ),
+    array(
+      'name' => 'Medium',
+      'id'   => "{$prefix}inter_medium",
+      'type' => 'radio',
+      'options' => array(
+        'Email' => 'Email',
+        'Phone' => 'Phone',
+        'In Person' => 'In Person',
+        'Other' => 'Other',
+      ),
+    ),
+    array(
+      'name' => 'Notes',
+      'id'   => "{$prefix}inter_notes",
+      'type' => 'wysiwyg',
+			'std'  => '',
+			'options' => array(
+				'textarea_rows' => 15,
+				'teeny'         => false,
+				'media_buttons' => true,
+			),
     ),
   ),
 );

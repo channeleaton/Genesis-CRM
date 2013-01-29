@@ -21,13 +21,14 @@ function be_complete_loop() {
 	do_action( 'genesis_post_title' );
 	do_action( 'genesis_after_post_title' );
 
-	global $prefix;
+  $prefix = CRM_PREFIX;
 	$args = array(
-		'category_name' => 'complete',
+    'post_type' => 'project',
 		'posts_per_page' => '20',
 		'meta_query' => array(
 			array(
-				'key' => $prefix.'include_complete'
+        'key' => $prefix.'project_status',
+        'value' => 'Project Complete',
 			)
 		)
 	);
